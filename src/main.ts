@@ -29,3 +29,9 @@ button.addEventListener("click", () => {
   counter++;
   counterDisplay.innerHTML = `${counter} fries`;
 });
+
+// add automatic clicking
+setInterval(() => {
+    counter++;
+    counterDisplay.innerHTML = `${counter} fries`;
+  }, 1000);
