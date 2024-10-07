@@ -18,5 +18,14 @@ const button = document.createElement("button");
 button.innerHTML = buttonName;
 app.append(button);
 
+// add a counter display
+const counterDisplay = document.createElement("div");
+let counter: number = 0;
+counterDisplay.innerHTML = `${counter} fries`;
+app.append(counterDisplay);
 
-
+// update counter on button click
+button.addEventListener("click", () => {
+  counter++;
+  counterDisplay.innerHTML = `${counter} fries`;
+});
