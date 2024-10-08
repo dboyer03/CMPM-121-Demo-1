@@ -23,53 +23,56 @@ let counter: number = 0;
 counterDisplay.innerHTML = `${counter} fries`;
 app.append(counterDisplay);
 
-// add a status display
+// add status displays
 const growthRateDisplay = document.createElement("div");
 let growthRate: number = 0;
 growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
 app.append(growthRateDisplay);
 
 const itemCountsDisplay = document.createElement("div");
-const itemCounts: { [key: string]: number } = { A: 0, B: 0, C: 0 };
+type ItemKey = 'A' | 'B' | 'C';
+const itemCounts: Record<ItemKey, number> = { A: 0, B: 0, C: 0 };
 itemCountsDisplay.innerHTML = `Items Purchased: A: ${itemCounts.A}, B: ${itemCounts.B}, C: ${itemCounts.C}`;
 app.append(itemCountsDisplay);
 
 // add upgrade buttons
-const upgrades: { name: string; cost: number; rate: number; button?: HTMLButtonElement }[] = [
-    { name: "Upgrade A", cost: 10, rate: 0.1 },
-    { name: "Upgrade B", cost: 100, rate: 2.0 },
-    { name: "Upgrade C", cost: 1000, rate: 50.0 },
-  ];
-  
-  upgrades.forEach(upgrade => {
-    const upgradeButton = document.createElement("button");
-    upgradeButton.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.cost} fries`;
-    upgradeButton.disabled = true; // initially disabled
-    app.append(upgradeButton);
-  
-    upgradeButton.addEventListener("click", () => {
-      if (counter >= upgrade.cost) {
-        counter -= upgrade.cost;
-        growthRate += upgrade.rate;
-        itemCounts[upgrade.name]++;
-        updateCounterDisplay();
-      }
-    });
-  
-    upgrade.button = upgradeButton;
+const upgrades: { name: string; baseCost: number; currentCost: number; rate: number; button?: HTMLButtonElement }[] = [
+  { name: "A", baseCost: 10, currentCost: 10, rate: 0.1 }, 
+  { name: "B", baseCost: 100, currentCost: 100, rate: 2.0 }, 
+  { name: "C", baseCost: 1000, currentCost: 1000, rate: 50.0 },
+];
+
+upgrades.forEach(upgrade => {
+  const upgradeButton = document.createElement("button");
+  upgradeButton.innerHTML = `Buy ${upgrade.name} (+${upgrade.rate} fries/sec) - ${upgrade.currentCost.toFixed(2)} fries`;
+  upgradeButton.disabled = true; // initially disabled
+  app.append(upgradeButton);
+
+  upgradeButton.addEventListener("click", () => {
+    if (counter >= upgrade.currentCost) { 
+      counter -= upgrade.currentCost; 
+      growthRate += upgrade.rate;
+      itemCounts[upgrade.name as ItemKey]++;
+      upgrade.currentCost *= 1.15; // increase cost by factor of 1.15
+      updateCounterDisplay();
+    }
   });
-  
-  // update counter display and upgrade button states
-  const updateCounterDisplay = () => {
-    counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
-    growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
-    itemCountsDisplay.innerHTML = `Items Purchased: A: ${itemCounts.A}, B: ${itemCounts.B}, C: ${itemCounts.C}`;
-    upgrades.forEach(upgrade => {
-      if (upgrade.button) {
-        upgrade.button.disabled = counter < upgrade.cost;
-      }
-    });
-  };
+
+  upgrade.button = upgradeButton;
+});
+
+// update counter display and upgrade button states
+const updateCounterDisplay = () => {
+  counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
+  growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
+  itemCountsDisplay.innerHTML = `Items Purchased: A: ${itemCounts.A}, B: ${itemCounts.B}, C: ${itemCounts.C}`;
+  upgrades.forEach((upgrade) => {
+    if (upgrade.button) {
+        upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries`;
+        upgrade.button.disabled = counter < upgrade.currentCost; 
+    }
+  });
+};
 
 // update counter on button click
 button.addEventListener("click", () => {
