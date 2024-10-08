@@ -24,14 +24,27 @@ let counter: number = 0;
 counterDisplay.innerHTML = `${counter} fries`;
 app.append(counterDisplay);
 
+// function to update counter display
+const updateCounterDisplay = () => {
+    counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
+  };
+
 // update counter on button click
 button.addEventListener("click", () => {
   counter++;
-  counterDisplay.innerHTML = `${counter} fries`;
+  updateCounterDisplay();
 });
 
 // add automatic clicking
-setInterval(() => {
-    counter++;
-    counterDisplay.innerHTML = `${counter} fries`;
-  }, 1000);
+// increment counter based on elapsed time
+let lastTime = performance.now();
+
+const animate = (time: number) => {
+  const deltaTime = time - lastTime;
+  counter += deltaTime / 1000; // Increment counter by the fraction of a second
+  updateCounterDisplay();
+  lastTime = time;
+  requestAnimationFrame(animate);
+};
+
+requestAnimationFrame(animate);
