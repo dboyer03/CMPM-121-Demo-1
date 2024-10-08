@@ -24,15 +24,32 @@ let counter: number = 0;
 counterDisplay.innerHTML = `${counter} fries`;
 app.append(counterDisplay);
 
+// add an upgrade button
+const upgradeButton = document.createElement("button");
+upgradeButton.innerHTML = "buy fry cook (+1 growth rate)";
+upgradeButton.disabled = true; // Initially disabled
+app.append(upgradeButton);
+
 // function to update counter display
 const updateCounterDisplay = () => {
-    counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
-  };
+  counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
+  upgradeButton.disabled = counter < 10; // Enable button if counter is at least 10
+};
 
 // update counter on button click
 button.addEventListener("click", () => {
   counter++;
   updateCounterDisplay();
+});
+
+// handle upgrade button click
+let growthRate = 0;
+upgradeButton.addEventListener("click", () => {
+  if (counter >= 10) {
+    counter -= 10;
+    growthRate += 1;
+    updateCounterDisplay();
+  }
 });
 
 // add automatic clicking
@@ -41,7 +58,7 @@ let lastTime = performance.now();
 
 const animate = (time: number) => {
   const deltaTime = time - lastTime;
-  counter += deltaTime / 1000; // Increment counter by the fraction of a second
+  counter += (deltaTime / 1000) * growthRate; // Increment counter by the fraction of a second times the growth rate
   updateCounterDisplay();
   lastTime = time;
   requestAnimationFrame(animate);
