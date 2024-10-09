@@ -30,23 +30,31 @@ growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
 app.append(growthRateDisplay);
 
 const itemCountsDisplay = document.createElement("div");
-type ItemKey = "A" | "B" | "C";
-const itemCounts: Record<ItemKey, number> = { A: 0, B: 0, C: 0 };
-itemCountsDisplay.innerHTML = `Items Purchased: Fry cook: ${itemCounts.A}, Fry god: ${itemCounts.B}, Fry legend: ${itemCounts.C}`;
+interface Item {
+  name: string;
+  cost: number;
+  rate: number;
+}
+
+const availableItems: Item[] = [
+  { name: "Fry cook", cost: 10, rate: 0.1 },
+  { name: "Fry god", cost: 100, rate: 2 },
+  { name: "Fry legend", cost: 1000, rate: 50 },
+  { name: "Fry horror", cost: 10000, rate: 1000 },
+];
+
+const itemCounts: Record<string, number> = {};
+availableItems.forEach(item => itemCounts[item.name] = 0);
+
+itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map(item => `${item.name}: ${itemCounts[item.name]}`).join(', ')}`;
 app.append(itemCountsDisplay);
 
 // add upgrade buttons
-const upgrades: {
-  name: string;
-  baseCost: number;
-  currentCost: number;
-  rate: number;
-  button?: HTMLButtonElement;
-}[] = [
-  { name: "Fry cook", baseCost: 10, currentCost: 10, rate: 0.1 },
-  { name: "Fry god", baseCost: 100, currentCost: 100, rate: 2.0 },
-  { name: "Fry legend", baseCost: 1000, currentCost: 1000, rate: 50.0 },
-];
+const upgrades = availableItems.map(item => ({
+  ...item,
+  currentCost: item.cost,
+  button: undefined as HTMLButtonElement | undefined
+}));
 
 upgrades.forEach((upgrade) => {
   const upgradeButton = document.createElement("button");
@@ -58,7 +66,7 @@ upgrades.forEach((upgrade) => {
     if (counter >= upgrade.currentCost) {
       counter -= upgrade.currentCost;
       growthRate += upgrade.rate;
-      itemCounts[upgrade.name as ItemKey]++;
+      itemCounts[upgrade.name]++;
       upgrade.currentCost *= 1.15; // increase cost by factor of 1.15
       updateCounterDisplay();
     }
@@ -71,7 +79,7 @@ upgrades.forEach((upgrade) => {
 const updateCounterDisplay = () => {
   counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
   growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
-  itemCountsDisplay.innerHTML = `Items Purchased: Fry cook: ${itemCounts.A}, Fry god: ${itemCounts.B}, Fry legend: ${itemCounts.C}`;
+  itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map(item => `${item.name}: ${itemCounts[item.name]}`).join(', ')}`;
   upgrades.forEach((upgrade) => {
     if (upgrade.button) {
       upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries`;
