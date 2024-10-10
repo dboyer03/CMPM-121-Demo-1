@@ -34,26 +34,28 @@ interface Item {
   name: string;
   cost: number;
   rate: number;
+  description: string;
 }
 
 const availableItems: Item[] = [
-  { name: "Fry cook", cost: 10, rate: 0.1 },
-  { name: "Fry god", cost: 100, rate: 2 },
-  { name: "Fry legend", cost: 1000, rate: 50 },
-  { name: "Fry horror", cost: 10000, rate: 1000 },
+  { name: "Fry Cook", cost: 10, rate: 0.1, description: '"Flips fries with finesse"' },
+  { name: "Automatic Frier", cost: 100, rate: 2, description: '"Fries without the fuss"' },
+  { name: "Spontaneous Fry Creator", cost: 1000, rate: 50, description: '"Creates fries out of thin air"' },
+  { name: "The Fry Man", cost: 10000, rate: 1000, description: '"A legend in the fry world"' },
+  { name: "Ronald McDonald", cost: 100000, rate: 100000, description: '"The ultimate fry master"' },
 ];
 
 const itemCounts: Record<string, number> = {};
-availableItems.forEach(item => itemCounts[item.name] = 0);
+availableItems.forEach((item) => (itemCounts[item.name] = 0));
 
-itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map(item => `${item.name}: ${itemCounts[item.name]}`).join(', ')}`;
+itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map((item) => `${item.name}: ${itemCounts[item.name]}`).join(", ")}`;
 app.append(itemCountsDisplay);
 
 // add upgrade buttons
-const upgrades = availableItems.map(item => ({
+const upgrades = availableItems.map((item) => ({
   ...item,
   currentCost: item.cost,
-  button: undefined as HTMLButtonElement | undefined
+  button: undefined as HTMLButtonElement | undefined,
 }));
 
 upgrades.forEach((upgrade) => {
@@ -79,10 +81,10 @@ upgrades.forEach((upgrade) => {
 const updateCounterDisplay = () => {
   counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
   growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
-  itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map(item => `${item.name}: ${itemCounts[item.name]}`).join(', ')}`;
+  itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map((item) => `${item.name}: ${itemCounts[item.name]}`).join(", ")}`;
   upgrades.forEach((upgrade) => {
     if (upgrade.button) {
-      upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries`;
+      upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries <br> ${upgrade.description}`;
       upgrade.button.disabled = counter < upgrade.currentCost;
     }
   });

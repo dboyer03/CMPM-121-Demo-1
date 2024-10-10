@@ -74,3 +74,36 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* New styles */
+.clicker {
+  display: block;
+  margin: 0 auto;
+  padding: 0px 0px;
+  font-size: 100px;
+  text-align: center;
+  background-color: #008CBA;
+  color: yellow;
+  border: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.upgrade {
+  display: block;
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: center;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  top: 10%;
+  right: 5%;
+}
