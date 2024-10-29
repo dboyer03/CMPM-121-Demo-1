@@ -2,34 +2,35 @@ import "./style.css";
 
 const app: HTMLDivElement = document.querySelector("#app")!;
 
-// set the title of the page
+// Utility function to create and append elements
+const createElement = (tag: string, innerHTML: string, parent: HTMLElement): HTMLElement => {
+  const element = document.createElement(tag);
+  element.innerHTML = innerHTML;
+  parent.append(element);
+  return element;
+};
+
+// Set the title of the page
 const gameName = "macdonald fry clicker";
 document.title = gameName;
 
-// add a header
-const header = document.createElement("h1");
-header.innerHTML = gameName;
-app.append(header);
+// Add a header
+createElement("h1", gameName, app);
 
-// add a button
-const buttonName = "🍟";
-const button = document.createElement("button");
-button.innerHTML = buttonName;
-app.append(button);
+// Add a button
+const buttonLabel = "🍟";
+const fryButton = createElement("button", buttonLabel, app) as HTMLButtonElement;
 
-// add a counter display
-const counterDisplay = document.createElement("div");
-let counter: number = 0;
-counterDisplay.innerHTML = `${counter} fries`;
-app.append(counterDisplay);
+// Add a counter display
+let fryCount: number = 0;
+const fryCountDisplay = createElement("div", `${fryCount} fries`, app);
 
-// add status displays
-const growthRateDisplay = document.createElement("div");
-let growthRate: number = 0;
-growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
-app.append(growthRateDisplay);
+// Add status displays
+let fryGrowthRate: number = 0;
+const fryGrowthRateDisplay = createElement("div", `Growth Rate: ${fryGrowthRate.toFixed(2)} fries/sec`, app);
+const itemCountsDisplay = createElement("div", "", app);
 
-const itemCountsDisplay = document.createElement("div");
+// Define Item interface
 interface Item {
   name: string;
   cost: number;
@@ -37,6 +38,7 @@ interface Item {
   description: string;
 }
 
+// Available items
 const availableItems: Item[] = [
   { name: "Fry Cook", cost: 10, rate: 0.1, description: '"Flips fries with finesse"' },
   { name: "Automatic Frier", cost: 100, rate: 2, description: '"Fries without the fuss"' },
@@ -45,13 +47,11 @@ const availableItems: Item[] = [
   { name: "Ronald McDonald", cost: 100000, rate: 100000, description: '"The ultimate fry master"' },
 ];
 
+// Item counts
 const itemCounts: Record<string, number> = {};
 availableItems.forEach((item) => (itemCounts[item.name] = 0));
 
-itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map((item) => `${item.name}: ${itemCounts[item.name]}`).join(", ")}`;
-app.append(itemCountsDisplay);
-
-// add upgrade buttons
+// Add upgrade buttons
 const upgrades = availableItems.map((item) => ({
   ...item,
   currentCost: item.cost,
@@ -59,52 +59,50 @@ const upgrades = availableItems.map((item) => ({
 }));
 
 upgrades.forEach((upgrade) => {
-  const upgradeButton = document.createElement("button");
-  upgradeButton.innerHTML = `Buy ${upgrade.name} (+${upgrade.rate} fries/sec) - ${upgrade.currentCost.toFixed(2)} fries`;
+  const upgradeButton = createElement("button", `Buy ${upgrade.name} (+${upgrade.rate} fries/sec) - ${upgrade.currentCost.toFixed(2)} fries`, app) as HTMLButtonElement;
   upgradeButton.disabled = true; // initially disabled
-  app.append(upgradeButton);
 
   upgradeButton.addEventListener("click", () => {
-    if (counter >= upgrade.currentCost) {
-      counter -= upgrade.currentCost;
-      growthRate += upgrade.rate;
+    if (fryCount >= upgrade.currentCost) {
+      fryCount -= upgrade.currentCost;
+      fryGrowthRate += upgrade.rate;
       itemCounts[upgrade.name]++;
       upgrade.currentCost *= 1.15; // increase cost by factor of 1.15
-      updateCounterDisplay();
+      updateFryCountDisplay();
     }
   });
 
   upgrade.button = upgradeButton;
 });
 
-// update counter display and upgrade button states
-const updateCounterDisplay = () => {
-  counterDisplay.innerHTML = `${counter.toFixed(2)} fries`;
-  growthRateDisplay.innerHTML = `Growth Rate: ${growthRate.toFixed(2)} fries/sec`;
+// Update counter display and upgrade button states
+const updateFryCountDisplay = () => {
+  fryCountDisplay.innerHTML = `${fryCount.toFixed(2)} fries`;
+  fryGrowthRateDisplay.innerHTML = `Growth Rate: ${fryGrowthRate.toFixed(2)} fries/sec`;
   itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map((item) => `${item.name}: ${itemCounts[item.name]}`).join(", ")}`;
   upgrades.forEach((upgrade) => {
     if (upgrade.button) {
       upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries <br> ${upgrade.description}`;
-      upgrade.button.disabled = counter < upgrade.currentCost;
+      upgrade.button.disabled = fryCount < upgrade.currentCost;
     }
   });
 };
 
-// update counter on button click
-button.addEventListener("click", () => {
-  counter++;
-  updateCounterDisplay();
+// Update counter on button click
+fryButton.addEventListener("click", () => {
+  fryCount++;
+  updateFryCountDisplay();
 });
 
-// add automatic clicking
-// increment counter based on elapsed time
-let lastTime = performance.now();
+// Add automatic clicking
+// Increment counter based on elapsed time
+let lastUpdateTime = performance.now();
 
-const animate = (time: number) => {
-  const deltaTime = time - lastTime;
-  counter += (deltaTime / 1000) * growthRate; // increment counter by the fraction of a second times the growth rate
-  updateCounterDisplay();
-  lastTime = time;
+const animate = (currentTime: number) => {
+  const deltaTime = currentTime - lastUpdateTime;
+  fryCount += (deltaTime / 1000) * fryGrowthRate; // increment counter by the fraction of a second times the growth rate
+  updateFryCountDisplay();
+  lastUpdateTime = currentTime;
   requestAnimationFrame(animate);
 };
 
