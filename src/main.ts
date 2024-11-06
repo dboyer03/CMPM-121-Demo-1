@@ -3,7 +3,11 @@ import "./style.css";
 const app: HTMLDivElement = document.querySelector("#app")!;
 
 // Utility function to create and append elements
-const createElement = (tag: string, innerHTML: string, parent: HTMLElement): HTMLElement => {
+const createElement = (
+  tag: string,
+  innerHTML: string,
+  parent: HTMLElement,
+): HTMLElement => {
   const element = document.createElement(tag);
   element.innerHTML = innerHTML;
   parent.append(element);
@@ -17,18 +21,35 @@ document.title = gameName;
 // Add a header
 createElement("h1", gameName, app);
 
-// Add a button
-const buttonLabel = "🍟";
-const fryButton = createElement("button", buttonLabel, app) as HTMLButtonElement;
-
-// Add a counter display
+// Add status displays
 let fryCount: number = 0;
 const fryCountDisplay = createElement("div", `${fryCount} fries`, app);
+fryCountDisplay.classList.add("status-display");
 
-// Add status displays
 let fryGrowthRate: number = 0;
-const fryGrowthRateDisplay = createElement("div", `Growth Rate: ${fryGrowthRate.toFixed(2)} fries/sec`, app);
-const itemCountsDisplay = createElement("div", "", app);
+const fryGrowthRateDisplay = createElement(
+  "div",
+  `Growth Rate: ${fryGrowthRate.toFixed(2)} fries/sec`,
+  app,
+);
+fryGrowthRateDisplay.classList.add("status-display");
+
+// Create a container for the clicker button
+const clickerContainer = createElement("div", "", app);
+clickerContainer.id = "clicker-container";
+
+// Add a button
+const buttonLabel = "🍟";
+const fryButton = createElement(
+  "button",
+  buttonLabel,
+  clickerContainer,
+) as HTMLButtonElement;
+fryButton.classList.add("clicker"); // Add this line to apply the clicker class
+
+// Create a container for the upgrade buttons
+const upgradesContainer = createElement("div", "", app);
+upgradesContainer.id = "upgrades-container";
 
 // Define Item interface
 interface Item {
@@ -40,11 +61,36 @@ interface Item {
 
 // Available items
 const availableItems: Item[] = [
-  { name: "Fry Cook", cost: 10, rate: 0.1, description: '"Flips fries with finesse"' },
-  { name: "Automatic Frier", cost: 100, rate: 2, description: '"Fries without the fuss"' },
-  { name: "Spontaneous Fry Creator", cost: 1000, rate: 50, description: '"Creates fries out of thin air"' },
-  { name: "The Fry Man", cost: 10000, rate: 1000, description: '"A legend in the fry world"' },
-  { name: "Ronald McDonald", cost: 100000, rate: 100000, description: '"The ultimate fry master"' },
+  {
+    name: "Fry Cook",
+    cost: 10,
+    rate: 0.1,
+    description: '"Flips fries with finesse"',
+  },
+  {
+    name: "Automatic Frier",
+    cost: 100,
+    rate: 2,
+    description: '"Fries without the fuss"',
+  },
+  {
+    name: "Spontaneous Fry Creator",
+    cost: 1000,
+    rate: 50,
+    description: '"Creates fries out of thin air"',
+  },
+  {
+    name: "The Fry Man",
+    cost: 10000,
+    rate: 1000,
+    description: '"A legend in the fry world"',
+  },
+  {
+    name: "Ronald McDonald",
+    cost: 100000,
+    rate: 100000,
+    description: '"The ultimate fry master"',
+  },
 ];
 
 // Item counts
@@ -59,7 +105,11 @@ const upgrades = availableItems.map((item) => ({
 }));
 
 upgrades.forEach((upgrade) => {
-  const upgradeButton = createElement("button", `Buy ${upgrade.name} (+${upgrade.rate} fries/sec) - ${upgrade.currentCost.toFixed(2)} fries`, app) as HTMLButtonElement;
+  const upgradeButton = createElement(
+    "button",
+    `Buy ${upgrade.name} (+${upgrade.rate} fries/sec) - ${upgrade.currentCost.toFixed(2)} fries`,
+    upgradesContainer,
+  ) as HTMLButtonElement;
   upgradeButton.disabled = true; // initially disabled
 
   upgradeButton.addEventListener("click", () => {
@@ -79,10 +129,9 @@ upgrades.forEach((upgrade) => {
 const updateFryCountDisplay = () => {
   fryCountDisplay.innerHTML = `${fryCount.toFixed(2)} fries`;
   fryGrowthRateDisplay.innerHTML = `Growth Rate: ${fryGrowthRate.toFixed(2)} fries/sec`;
-  itemCountsDisplay.innerHTML = `Items Purchased: ${availableItems.map((item) => `${item.name}: ${itemCounts[item.name]}`).join(", ")}`;
   upgrades.forEach((upgrade) => {
     if (upgrade.button) {
-      upgrade.button.innerHTML = `Buy: ${upgrade.name} (+${upgrade.rate} fries/sec) - Cost: ${upgrade.currentCost.toFixed(2)} fries <br> ${upgrade.description}`;
+      upgrade.button.innerHTML = `${upgrade.name} $${upgrade.currentCost.toFixed(2)} (${itemCounts[upgrade.name]}) <br> ${upgrade.description}`;
       upgrade.button.disabled = fryCount < upgrade.currentCost;
     }
   });
