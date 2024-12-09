@@ -3,4 +3,5 @@ This is the starter code project for the `Demo 1` project in CMPM 121, Game Deve
 Huge thank you to the following people and projects for UI inspiration:
 
 https://github.com/rozy-dixon/cmpm-121-demo-1
+
 https://github.com/scso-ucsc/Incremental-Game-Development
